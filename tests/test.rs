@@ -46,7 +46,7 @@ use cryptfolio::app::CryptfolioApp;
 
 // #[test]
 // fn coin_record() {
-//     let app = CryptfolioApp::new("test.db").unwrap();
+//     let app = CryptfolioApp::new("local/test.db").unwrap();
 //     let coin = app.get_coin_record("LINK".to_string());
 
 //     println!("Balance: {} | Avg: {} | Gross: {} | Net: {} | Current Invested: {} | Total Invested: {} | Fees: {}",
