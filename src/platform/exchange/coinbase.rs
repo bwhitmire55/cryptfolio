@@ -56,31 +56,43 @@ impl Coinbase {
         match transaction.type_transaction.as_str() {
             "send" => {
                 if let Some(from) = transaction.from {
-                    if let Some(desc) = transaction.description {
-                        if desc == "Earn Task".to_string() {
-                            Ok(Box::new(CoinReward::new(
-                                transaction.id,
-                                transaction.created_at,
-                                transaction.amount.currency,
-                                transaction.native_amount.amount.parse::<f64>().unwrap() / transaction.amount.amount.parse::<f64>().unwrap(),
-                                transaction.amount.amount.parse::<f64>().unwrap(),
-                                "Earn Task".to_string(),
-                                "Learn & Earn Reward".to_string()
-                            )))
-                        } else {
-                            Ok(Box::new(CoinTransfer::new(
-                                transaction.id,
-                                transaction.created_at,
-                                from.id.unwrap(),
-                                account_id.to_string(),
-                                from.currency.unwrap(),
-                                transaction.amount.amount.parse::<f64>().unwrap(),
-                                0.0
-                            )))
-                        }
-                    } else {
-                        if let Some(subtitle) = transaction.details.subtitle {
-                            if subtitle == "From Coinbase Rewards".to_string() {
+                    // if let Some(desc) = transaction.description {
+                    //     if desc == "Earn Task".to_string() {
+                    //         Ok(Box::new(CoinReward::new(
+                    //             transaction.id,
+                    //             transaction.created_at,
+                    //             transaction.amount.currency,
+                    //             transaction.native_amount.amount.parse::<f64>().unwrap() / transaction.amount.amount.parse::<f64>().unwrap(),
+                    //             transaction.amount.amount.parse::<f64>().unwrap(),
+                    //             "Earn Task".to_string(),
+                    //             "Learn & Earn Reward".to_string()
+                    //         )))
+                    //     } else {
+                    //         Ok(Box::new(CoinTransfer::new(
+                    //             transaction.id,
+                    //             transaction.created_at,
+                    //             from.id.unwrap(),
+                    //             account_id.to_string(),
+                    //             from.currency.unwrap(),
+                    //             transaction.amount.amount.parse::<f64>().unwrap(),
+                    //             0.0
+                    //         )))
+                    //     }
+                    // } else {
+                    if let Some(subtitle) = transaction.details.subtitle {
+                        match subtitle.as_str() {
+                            "From Coinbase Earn" => {
+                                Ok(Box::new(CoinReward::new(
+                                    transaction.id,
+                                    transaction.created_at,
+                                    transaction.amount.currency,
+                                    transaction.native_amount.amount.parse::<f64>().unwrap() / transaction.amount.amount.parse::<f64>().unwrap(),
+                                    transaction.amount.amount.parse::<f64>().unwrap(),
+                                    "Learn & Earn".to_string(),
+                                    "Coinbase Earn".to_string()
+                                )))
+                            },
+                            "From Coinbase Rewards" => {
                                 Ok(Box::new(CoinReward::new(
                                     transaction.id,
                                     transaction.created_at,
@@ -90,7 +102,8 @@ impl Coinbase {
                                     "Staking".to_string(),
                                     "Coinbase Rewards".to_string()
                                 )))
-                            } else {
+                            },
+                            _ => {
                                 Ok(Box::new(CoinTransfer::new(
                                     transaction.id,
                                     transaction.created_at,
@@ -100,18 +113,18 @@ impl Coinbase {
                                     transaction.amount.amount.parse::<f64>().unwrap(),
                                     0.0
                                 )))
-                            }
-                        } else {
-                            Ok(Box::new(CoinTransfer::new(
-                                transaction.id,
-                                transaction.created_at,
-                                from.id.unwrap(),
-                                account_id.to_string(),
-                                from.currency.unwrap(),
-                                transaction.amount.amount.parse::<f64>().unwrap(),
-                                0.0
-                            )))
+                            },
                         }
+                    } else {
+                        Ok(Box::new(CoinTransfer::new(
+                            transaction.id,
+                            transaction.created_at,
+                            from.id.unwrap(),
+                            account_id.to_string(),
+                            from.currency.unwrap(),
+                            transaction.amount.amount.parse::<f64>().unwrap(),
+                            0.0
+                        )))
                     }
                 } else if let Some(to) = transaction.to {
                     Ok(Box::new(CoinTransfer::new(
@@ -126,6 +139,22 @@ impl Coinbase {
                 } else {
                     Err(CryptfolioError::CoinbaseAPIError("Failed to parse 'send' transaction".to_string()))
                 }
+            },
+            "interest" => {
+                // Incredibly small staking rewards will not give appropriate cost basis for asset
+                let unit_price = match transaction.native_amount.amount.parse::<f64>().unwrap() < 0.01 {
+                    true => { 0.0 },
+                    false => { transaction.native_amount.amount.parse::<f64>().unwrap() / transaction.amount.amount.parse::<f64>().unwrap() },
+                };
+                Ok(Box::new(CoinReward::new(
+                    transaction.id,
+                    transaction.created_at,
+                    transaction.amount.currency,
+                    unit_price,
+                    transaction.amount.amount.parse::<f64>().unwrap(),
+                    "Staking".to_string(),
+                    "Coinbase Rewards".to_string()
+                )))
             },
             // "request" => {
                 
@@ -348,6 +377,8 @@ impl SyncClient for Coinbase {
 
         Ok(result)
 
+        // --------------------------------------------------------------------------------------------------
+
         // match self.client.fetch_accounts().await {
         //     Ok(response) => {
         //         for account in response {
@@ -380,7 +411,7 @@ impl SyncClient for Coinbase {
         // Ok(result)
 
         // match self.client.print_response(
-        //     &"/v2/accounts/be24867b-9335-54e8-9390-498af2bbd59b/transactions/4e039a99-1672-56c6-9a91-a5cf36fe5963?expand[]=buy&expand[]=sell&expand[]=trade"
+        //     &"/v2/accounts/e7ccc453-7e87-50ee-94b9-7750c5e92935/transactions?expand[]=buy&expand[]=sell&expand[]=trade"
         //     .to_string()
         // ).await {
         //     Ok(response) => { println!("{}", response); }
