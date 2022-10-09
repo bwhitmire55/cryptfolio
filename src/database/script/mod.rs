@@ -130,5 +130,30 @@ impl DatabaseScript {
             )
             WHERE destination = 'Coinbase Pro'
         ").unwrap();
+
+        // Updating transfers table to replace 'Coinbase Pro' origin & destination entries
+        dbh.execute("
+            UPDATE transfers
+            SET origin = (
+                SELECT id
+                FROM accounts
+                WHERE platform = 'Coinbase Pro'
+                AND platform IS NOT NULL
+                LIMIT 1
+            )
+            WHERE origin = 'Coinbase Pro'
+        ").unwrap();
+
+        dbh.execute("
+            UPDATE transfers
+            SET destination = (
+                SELECT id
+                FROM accounts
+                WHERE platform = 'Coinbase Pro'
+                AND platform IS NOT NULL
+                LIMIT 1
+            )
+            WHERE destination = 'Coinbase Pro'
+        ").unwrap();
     }
 }
