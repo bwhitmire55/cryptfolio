@@ -1,3 +1,4 @@
+use crate::error::CryptfolioError;
 use crate::recording::CoinRecord;
 
 use sqlite3::Connection;
@@ -6,6 +7,59 @@ use sqlite3::State;
 pub struct DatabaseScript {}
 
 impl DatabaseScript {
+    pub fn create_default_tables(dbh: &Connection) -> Result<(), CryptfolioError> {
+        match dbh.execute("
+            CREATE TABLE IF NOT EXISTS accounts (
+                id TEXT UNIQUE,
+                coin TEXT,
+                platform TEXT   
+            );
+
+            CREATE TABLE IF NOT EXISTS fiat_transfers (
+                id TEXT,
+                date TEXT,
+                origin TEXT,
+                destination TEXT,
+                amount REAL
+            );
+
+            CREATE TABLE IF NOT EXISTS orders (
+                id TEXT,
+                date TEXT,
+                pair TEXT,
+                unit_price REAL,
+                unit_size REAL,
+                fee REAL,
+                side TEXT,
+                platform TEXT
+            );
+            
+            CREATE TABLE IF NOT EXISTS rewards (
+                id TEXT,
+                date TEXT,
+                coin TEXT,
+                unit_price REAL,
+                unit_size REAL,
+                type TEXT,
+                description TEXT
+            );
+            
+            CREATE TABLE IF NOT EXISTS transfers (
+                id TEXT,
+                date TEXT,
+                origin TEXT,
+                destination TEXT,
+                coin TEXT,
+                unit_size REAL,
+                fee REAL
+            );
+        ")
+        {
+            Ok(_) => { Ok(()) },
+            Err(_) => { return Err(CryptfolioError::DatabaseQueryFailed("Failed to create default tables".to_string())); }
+        }
+    }
+
     pub fn fetch_coin_record(dbh: &Connection, coin: String) -> CoinRecord {
         let mut record = CoinRecord::new();
         let mut statement = dbh.prepare("
