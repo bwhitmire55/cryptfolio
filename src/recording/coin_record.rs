@@ -161,6 +161,7 @@ impl CoinRecord {
                     transaction.date.to_string(),
                     current_buy_price,
                     transaction.price,
+                    remaining_sell_shares,
                     profit
                 ));
                 break;
@@ -168,15 +169,16 @@ impl CoinRecord {
                 profit = (current_buy_shares * transaction.price) - (current_buy_shares * current_buy_price);
                 self.gross_profit += profit;
                 self.total_invested += current_buy_shares * current_buy_price;
-                remaining_sell_shares -= current_buy_shares;
                 self.tax_records.push(TaxRecord::new(
                     self.buys.front().unwrap().date.to_string(),
                     transaction.date.to_string(),
                     current_buy_price,
                     transaction.price,
+                    current_buy_shares,
                     profit
                 ));
                 self.buys.pop_front();
+                remaining_sell_shares -= current_buy_shares;
             }
             i += 1;
         }
