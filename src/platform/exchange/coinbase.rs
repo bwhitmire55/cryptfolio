@@ -163,16 +163,21 @@ impl Coinbase {
 
             // },
             "buy" => {
-                Ok(Box::new(CoinOrder::new(
-                    transaction.id,
-                    transaction.created_at,
-                    format!("{}-USD", transaction.amount.currency),
-                    transaction.buy.as_ref().unwrap().unit_price.as_ref().unwrap().amount.parse::<f64>().unwrap(),
-                    transaction.amount.amount.parse::<f64>().unwrap(),
-                    transaction.buy.as_ref().unwrap().fee.amount.parse::<f64>().unwrap(),
-                    "buy".to_string(),
-                    "Coinbase".to_string()
-                )))
+                // Avoid redundant same-currency orders.
+                if transaction.amount.currency == transaction.native_amount.currency {
+                    Ok(Box::new(Dud {}))
+                } else {
+                    Ok(Box::new(CoinOrder::new(
+                        transaction.id,
+                        transaction.created_at,
+                        format!("{}-USD", transaction.amount.currency),
+                        transaction.buy.as_ref().unwrap().unit_price.as_ref().unwrap().amount.parse::<f64>().unwrap(),
+                        transaction.amount.amount.parse::<f64>().unwrap(),
+                        transaction.buy.as_ref().unwrap().fee.amount.parse::<f64>().unwrap(),
+                        "buy".to_string(),
+                        "Coinbase".to_string()
+                    )))
+                }
             },
             // "sell" => {
             //     Ok(Box::new(CoinOrder::new(
@@ -244,26 +249,31 @@ impl Coinbase {
 
             // },
             "advanced_trade_fill" => {
-                let side: String;
-                let amount = transaction.amount.amount.parse::<f64>().unwrap();
-                if amount < 0.0 {
-                    side = "sell".to_string();
+                // Avoid redundant same-currency orders.
+                if transaction.amount.currency == transaction.native_amount.currency {
+                    Ok(Box::new(Dud {}))
                 } else {
-                    side = "buy".to_string();
-                }
+                    let side: String;
+                    let amount = transaction.amount.amount.parse::<f64>().unwrap();
+                    if amount < 0.0 {
+                        side = "sell".to_string();
+                    } else {
+                        side = "buy".to_string();
+                    }
 
-                Ok(Box::new(CoinOrder::new(
-                    transaction.id,
-                    transaction.created_at,
-                    format!("{}-USD", transaction.amount.currency),
-                    transaction.advanced_trade_fill.as_ref().unwrap().fill_price.parse::<f64>().unwrap(),
-                    transaction.amount.amount.parse::<f64>().unwrap().abs(),
-                    transaction.native_amount.amount.parse::<f64>().unwrap().abs() - 
-                    (transaction.amount.amount.parse::<f64>().unwrap().abs() *
-                    transaction.advanced_trade_fill.as_ref().unwrap().fill_price.parse::<f64>().unwrap()),
-                    side,
-                    "Coinbase".to_string()
-                )))
+                    Ok(Box::new(CoinOrder::new(
+                        transaction.id,
+                        transaction.created_at,
+                        format!("{}-USD", transaction.amount.currency),
+                        transaction.advanced_trade_fill.as_ref().unwrap().fill_price.parse::<f64>().unwrap(),
+                        transaction.amount.amount.parse::<f64>().unwrap().abs(),
+                        transaction.native_amount.amount.parse::<f64>().unwrap().abs() - 
+                        (transaction.amount.amount.parse::<f64>().unwrap().abs() *
+                        transaction.advanced_trade_fill.as_ref().unwrap().fill_price.parse::<f64>().unwrap()),
+                        side,
+                        "Coinbase".to_string()
+                    )))
+                }
             },
             "trade" => {
                 // clean this up...
@@ -319,6 +329,10 @@ impl SyncClient for Coinbase {
         match self.client.fetch_accounts().await {
             Ok(response) => {
                 for account in response {
+                    // Avoid adding accounts which have not been initialized for use, thus no valid ID.
+                    if account.id.len() < 10 {
+                        continue;
+                    }
                     result.push(Box::new(CoinAccount::new(
                         account.id.to_string(),
                         account.currency.code.to_string(),
@@ -411,7 +425,7 @@ impl SyncClient for Coinbase {
         // Ok(result)
 
         // match self.client.print_response(
-        //     &"/v2/accounts/e7ccc453-7e87-50ee-94b9-7750c5e92935/transactions?expand[]=buy&expand[]=sell&expand[]=trade"
+        //     &"/v2/accounts/edc51d44-6f3a-5c59-9210-aff67ff6df83/transactions/9b5cd3c3-0a13-5504-9b0a-cd6337bd5f23?expand[]=buy&expand[]=sell&expand[]=trade"
         //     .to_string()
         // ).await {
         //     Ok(response) => { println!("{}", response); }
