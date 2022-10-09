@@ -17,7 +17,7 @@
 /// 
 /// ///////////////////////////////////////////////////////////////////////////////////////////////
 
-use crate::database::entry::{CoinAccount, CoinOrder, CoinTransfer};
+use crate::database::entry::{CoinAccount, CoinOrder, CoinTransfer, FiatTransfer};
 use crate::database::entry::DatabaseEntry;
 use crate::error::CryptfolioError;
 use crate::platform::SyncClient;
@@ -107,15 +107,26 @@ impl CoinbasePro {
             _ => { origin = "".to_string(); destination = "".to_string(); fee = f64::NAN; }
         }
 
-        Box::new(CoinTransfer::new(
-            transfer.id,
-            transfer.created_at,
-            origin,
-            destination,
-            account.currency.to_string(),
-            transfer.amount.parse::<f64>().unwrap(),
-            fee
-        ))
+        // Separate fiat transfers to proper table.
+        if account.currency == "USD" {
+            Box::new(FiatTransfer::new(
+                transfer.id,
+                transfer.created_at,
+                origin,
+                destination,
+                transfer.amount.parse::<f64>().unwrap()
+            ))
+        } else {
+            Box::new(CoinTransfer::new(
+                transfer.id,
+                transfer.created_at,
+                origin,
+                destination,
+                account.currency.to_string(),
+                transfer.amount.parse::<f64>().unwrap(),
+                fee
+            ))
+        }        
     }
 }
 

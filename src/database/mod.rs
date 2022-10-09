@@ -38,7 +38,7 @@ impl Database {
 
             CREATE TABLE IF NOT EXISTS fiat_transfers (
                 id TEXT,
-                type TEXT,
+                date TEXT,
                 origin TEXT,
                 destination TEXT,
                 amount REAL

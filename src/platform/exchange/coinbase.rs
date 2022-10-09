@@ -171,7 +171,7 @@ impl Coinbase {
             "fiat_deposit" => {
                 Ok(Box::new(FiatTransfer::new(
                     transaction.id,
-                    "deposit".to_string(),
+                    transaction.created_at,
                     "FIAT Institution".to_string(),
                     account_id.to_string(),
                     transaction.amount.amount.parse::<f64>().unwrap().abs()
@@ -183,7 +183,7 @@ impl Coinbase {
             "exchange_deposit" => {
                 Ok(Box::new(FiatTransfer::new(
                     transaction.id,
-                    "send".to_string(),
+                    transaction.created_at,
                     account_id.to_string(),
                     "Coinbase Pro".to_string(),
                     transaction.amount.amount.parse::<f64>().unwrap().abs()
@@ -192,7 +192,7 @@ impl Coinbase {
             "exchange_withdrawal" => {
                 Ok(Box::new(FiatTransfer::new(
                     transaction.id,
-                    "send".to_string(),
+                    transaction.created_at,
                     "Coinbase Pro".to_string(),
                     account_id.to_string(),
                     transaction.amount.amount.parse::<f64>().unwrap().abs()
