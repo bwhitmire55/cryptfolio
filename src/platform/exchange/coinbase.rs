@@ -56,29 +56,6 @@ impl Coinbase {
         match transaction.type_transaction.as_str() {
             "send" => {
                 if let Some(from) = transaction.from {
-                    // if let Some(desc) = transaction.description {
-                    //     if desc == "Earn Task".to_string() {
-                    //         Ok(Box::new(CoinReward::new(
-                    //             transaction.id,
-                    //             transaction.created_at,
-                    //             transaction.amount.currency,
-                    //             transaction.native_amount.amount.parse::<f64>().unwrap() / transaction.amount.amount.parse::<f64>().unwrap(),
-                    //             transaction.amount.amount.parse::<f64>().unwrap(),
-                    //             "Earn Task".to_string(),
-                    //             "Learn & Earn Reward".to_string()
-                    //         )))
-                    //     } else {
-                    //         Ok(Box::new(CoinTransfer::new(
-                    //             transaction.id,
-                    //             transaction.created_at,
-                    //             from.id.unwrap(),
-                    //             account_id.to_string(),
-                    //             from.currency.unwrap(),
-                    //             transaction.amount.amount.parse::<f64>().unwrap(),
-                    //             0.0
-                    //         )))
-                    //     }
-                    // } else {
                     if let Some(subtitle) = transaction.details.subtitle {
                         match subtitle.as_str() {
                             "From Coinbase Earn" => {
