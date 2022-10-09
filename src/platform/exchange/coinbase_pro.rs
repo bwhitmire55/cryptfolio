@@ -79,9 +79,9 @@ impl CoinbasePro {
 
         match transfer.type_transfer.as_str() {
             "deposit" => {
-                if let Some(addr) = &transfer.details.as_ref().unwrap().crypto_address {
+                if let Some(_addr) = &transfer.details.as_ref().unwrap().crypto_address {
                     // deposit from external address
-                    origin = addr.to_string();
+                    origin = String::new();
                     destination = account.id.to_string();
                     fee = f64::NAN;
                 } else {
@@ -104,7 +104,7 @@ impl CoinbasePro {
                     fee = 0.0;
                 }
             },
-            _ => { origin = "???".to_string(); destination = "???".to_string(); fee = f64::NAN; }
+            _ => { origin = "".to_string(); destination = "".to_string(); fee = f64::NAN; }
         }
 
         Box::new(CoinTransfer::new(
