@@ -17,7 +17,7 @@
 /// 
 /// ///////////////////////////////////////////////////////////////////////////////////////////////
 
-use crate::database::entry::{CoinAccount, CoinOrder, CoinTransfer, FiatTransfer};
+use crate::database::entry::{CoinAccount, CoinOrder, CoinTransfer, FiatTransfer, PlatformConnection, PlatformConnectionData};
 use crate::database::entry::DatabaseEntry;
 use crate::error::CryptfolioError;
 use crate::platform::SyncClient;
@@ -132,6 +132,22 @@ impl CoinbasePro {
 
 #[async_trait]
 impl SyncClient for CoinbasePro {
+    fn get_name(&self) -> &str {
+        "Coinbase Pro"
+    }
+
+    fn get_connection(&self, nickname: &String) -> PlatformConnection {
+        return PlatformConnection::new(
+            nickname.to_string(), 
+            "Coinbase Pro".to_string(),
+           vec![ 
+                PlatformConnectionData { key: "API Key".to_string(), value: self.get_api_key() }, 
+                PlatformConnectionData { key: "API Secret".to_string(), value: self.get_api_secret() },
+                PlatformConnectionData { key: "Passphrase".to_string(), value: self.get_api_passphrase() }
+            ]
+        );
+    }
+
     async fn sync(&self) -> Result<Vec<Box<dyn DatabaseEntry + Send>>, CryptfolioError> {
         let mut result = Vec::<Box<dyn DatabaseEntry + Send>>::new();
         match self.client.fetch_accounts().await {

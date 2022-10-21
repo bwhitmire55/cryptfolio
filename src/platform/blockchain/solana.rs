@@ -18,7 +18,7 @@
 /// ///////////////////////////////////////////////////////////////////////////////////////////////
 
 use crate::error::CryptfolioError;
-use crate::database::entry::DatabaseEntry;
+use crate::database::entry::{DatabaseEntry, PlatformConnection, PlatformConnectionData};
 use crate::platform::SyncClient;
 use async_trait::async_trait;
 use solana_client::rpc_client::RpcClient;
@@ -60,6 +60,20 @@ impl Solana {
 
 #[async_trait]
 impl SyncClient for Solana {
+    fn get_name(&self) -> &str {
+        "Solana"
+    }
+
+    fn get_connection(&self, nickname: &String) -> PlatformConnection {
+        return PlatformConnection::new(
+            nickname.to_string(), 
+            "Solana".to_string(),
+           vec![ 
+                PlatformConnectionData { key: "Wallet Address".to_string(), value: self.get_wallet() }
+            ]
+        );
+    }
+
     async fn sync(&self) -> Result<Vec<Box<dyn DatabaseEntry + Send>>, CryptfolioError> {
         let result = Vec::<Box<dyn DatabaseEntry + Send>>::new();
 

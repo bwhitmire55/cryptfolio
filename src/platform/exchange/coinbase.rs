@@ -19,7 +19,10 @@
 
 use std::collections::HashMap;
 
-use crate::database::entry::{CoinAccount, CoinOrder, CoinTransfer, CoinReward, DatabaseEntry, Dud, FiatTransfer};
+use crate::database::entry::{
+    CoinAccount, CoinOrder, CoinTransfer, CoinReward, DatabaseEntry, 
+    Dud, FiatTransfer, PlatformConnection, PlatformConnectionData,
+};
 use crate::error::CryptfolioError;
 use crate::platform::SyncClient;
 use async_trait::async_trait;
@@ -300,6 +303,21 @@ impl Coinbase {
 
 #[async_trait]
 impl SyncClient for Coinbase {
+    fn get_name(&self) -> &str {
+        "Coinbase"
+    }
+
+    fn get_connection(&self, nickname: &String) -> PlatformConnection {
+        return PlatformConnection::new(
+            nickname.to_string(), 
+            "Coinbase".to_string(),
+           vec![ 
+                PlatformConnectionData { key: "API Key".to_string(), value: self.get_api_key() }, 
+                PlatformConnectionData { key: "API Secret".to_string(), value: self.get_api_secret() }
+            ]
+        );
+    }
+
     async fn sync(&self) -> Result<Vec<Box<dyn DatabaseEntry + Send>>, CryptfolioError> {
         let mut result = Vec::<Box<dyn DatabaseEntry + Send>>::new();
         let mut trade_resources = HashMap::<String, TradeResource>::new();

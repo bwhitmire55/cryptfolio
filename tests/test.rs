@@ -63,3 +63,14 @@ use cryptfolio::app::CryptfolioApp;
 //         println!("{:#?}", record);
 //     }
 // }
+
+// #[test]
+// fn platform_connection_persistance() {
+//     let app = CryptfolioApp::new("local/test.db").unwrap();
+//     let coinbase = cryptfolio::platform::exchange::Coinbase::new("KEY", "SECRET").unwrap();
+//     let coinbase_pro_1 = cryptfolio::platform::exchange::CoinbasePro::new("KEY", "SECRET", "PASSPHRASE").unwrap();
+//     let coinbase_pro_2 = cryptfolio::platform::exchange::CoinbasePro::new("KEY", "SECRET", "PASSPHRASE").unwrap();
+//     app.add_platform("Default Portfolio", coinbase).unwrap();
+//     app.add_platform("Default Portfolio", coinbase_pro_1).unwrap();
+//     app.add_platform("Blake", coinbase_pro_2).unwrap();
+// }

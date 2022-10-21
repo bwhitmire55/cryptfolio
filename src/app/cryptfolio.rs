@@ -49,16 +49,19 @@ impl CryptfolioApp {
     }
 
     pub fn add_platform<T: SyncClient + 'static>(&self, nickname: &str, platform: T) -> Result<Rc<Box<dyn SyncClient>>, CryptfolioError> {
-        if let Some(_) = self.connected_platforms.borrow_mut().insert(nickname.to_string(), Rc::new(Box::new(platform))) {
+        let key = format!("{}:{}", platform.get_name(), nickname.to_string());
+        if let Some(_) = self.connected_platforms.borrow_mut().insert(key.to_string(), Rc::new(Box::new(platform))) {
             return Err(CryptfolioError::PlatformAlreadyExists);
-        }
-        Ok(
-            self.connected_platforms
-                .borrow() 
-                .get(&nickname.to_string()) 
-                .map(|x| x.clone())
-                .unwrap()
-        )
+        } 
+
+        let handle = self.connected_platforms
+            .borrow()
+            .get(&key)
+            .map(|x| x.clone())
+            .unwrap();
+
+        handle.get_connection(&nickname.to_string()).write(self.database.get_dbh()).unwrap();
+        Ok(handle)
     }
 
     pub async fn sync_platform(&self, platform: Rc<Box<dyn SyncClient>>) -> Result<(), CryptfolioError> {

@@ -9,6 +9,19 @@ pub struct DatabaseScript {}
 impl DatabaseScript {
     pub fn create_default_tables(dbh: &Connection) -> Result<(), CryptfolioError> {
         match dbh.execute("
+            CREATE TABLE IF NOT EXISTS connections (
+                id INTEGER PRIMARY KEY,
+                nickname TEXT,
+                platform TEXT,
+                UNIQUE(nickname, platform)
+            );
+
+            CREATE TABLE IF NOT EXISTS connection_data (
+                connection INTEGER,
+                key STRING,
+                value STRING
+            );
+
             CREATE TABLE IF NOT EXISTS accounts (
                 id TEXT UNIQUE,
                 coin TEXT,

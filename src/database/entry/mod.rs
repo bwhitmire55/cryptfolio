@@ -3,11 +3,14 @@ pub mod coin_order;
 pub mod coin_reward;
 pub mod coin_transfer;
 pub mod fiat_transfer;
+pub mod platform_connection;
 pub use coin_account::CoinAccount;
 pub use coin_order::CoinOrder;
 pub use coin_reward::CoinReward;
 pub use coin_transfer::CoinTransfer;
 pub use fiat_transfer::FiatTransfer;
+pub use platform_connection::PlatformConnection;
+pub use platform_connection::PlatformConnectionData;
 
 use sqlite3::Connection;
 use crate::error::CryptfolioError;
