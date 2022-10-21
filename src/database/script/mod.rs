@@ -1,8 +1,11 @@
 use crate::error::CryptfolioError;
+use crate::database::entry::PlatformConnection;
+use crate::platform::SyncClient;
 use crate::recording::CoinRecord;
 
 use sqlite3::Connection;
 use sqlite3::State;
+use std::rc::Rc;
 
 pub struct DatabaseScript {}
 
@@ -13,13 +16,8 @@ impl DatabaseScript {
                 id INTEGER PRIMARY KEY,
                 nickname TEXT,
                 platform TEXT,
+                object BLOB,
                 UNIQUE(nickname, platform)
-            );
-
-            CREATE TABLE IF NOT EXISTS connection_data (
-                connection INTEGER,
-                key STRING,
-                value STRING
             );
 
             CREATE TABLE IF NOT EXISTS accounts (
@@ -71,6 +69,21 @@ impl DatabaseScript {
             Ok(_) => { Ok(()) },
             Err(_) => { return Err(CryptfolioError::DatabaseQueryFailed("Failed to create default tables".to_string())); }
         }
+    }
+
+    pub fn fetch_connections(dbh: &Connection) -> Vec<Rc<Box<dyn SyncClient>>> {
+        let mut connections = Vec::<PlatformConnection>::new();
+        let mut statement = dbh.prepare("SELECT object FROM connections").unwrap();
+        while let State::Row = statement.next().unwrap() {
+            connections.push(bincode::deserialize(&statement.read::<Vec<u8>>(0).unwrap() as &[u8]).unwrap());
+        }
+       
+        let mut clients = Vec::<Rc<Box<dyn SyncClient>>>::new();
+        for connection in connections {
+            clients.push(connection.to_concrete_type());
+        }
+
+        return clients;
     }
 
     pub fn fetch_coin_record(dbh: &Connection, coin: String) -> CoinRecord {

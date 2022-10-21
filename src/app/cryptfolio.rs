@@ -91,4 +91,10 @@ impl CryptfolioApp {
     pub fn get_coin_record(&self, coin: String) -> CoinRecord {
         DatabaseScript::fetch_coin_record(self.database.get_dbh(), coin)
     }
+
+    pub fn get_connections(&self) {
+        for connection in DatabaseScript::fetch_connections(self.database.get_dbh()) {
+            println!("Connection found: {}", connection.get_name());
+        }
+    }
 }

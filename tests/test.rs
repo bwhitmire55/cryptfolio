@@ -74,3 +74,9 @@ use cryptfolio::app::CryptfolioApp;
 //     app.add_platform("Default Portfolio", coinbase_pro_1).unwrap();
 //     app.add_platform("Blake", coinbase_pro_2).unwrap();
 // }
+
+#[test]
+fn get_connections() {
+    let app = CryptfolioApp::new("local/test.db").unwrap();
+    app.get_connections();
+}
