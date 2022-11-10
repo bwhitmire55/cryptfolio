@@ -33,12 +33,15 @@ pub struct CryptfolioApp {
 
 impl CryptfolioApp {
     pub fn new(db_path: &str) -> Result<CryptfolioApp, CryptfolioError> {
+        // Init database
         let db: Database;
-
         match Database::new(db_path) {
             Ok(database) => { db = database }
             Err(_) => { return Err(CryptfolioError::DatabaseConnectionFailed(db_path.to_string())) }
         }
+
+        // Load existing connections from database
+        
 
         Ok(
             CryptfolioApp {
@@ -92,9 +95,7 @@ impl CryptfolioApp {
         DatabaseScript::fetch_coin_record(self.database.get_dbh(), coin)
     }
 
-    pub fn get_connections(&self) {
-        for connection in DatabaseScript::fetch_connections(self.database.get_dbh()) {
-            println!("Connection found: {}", connection.get_name());
-        }
+    pub fn get_connections(&self) -> Vec<Rc<Box<dyn SyncClient>>> {
+        DatabaseScript::fetch_connections(self.database.get_dbh())
     }
 }

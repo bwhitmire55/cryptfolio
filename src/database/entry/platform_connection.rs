@@ -55,6 +55,10 @@ impl PlatformConnection {
         }
     }
 
+    pub fn get_nickname(&self) -> String {
+        return self.nickname.to_string();
+    }
+
     pub fn to_concrete_type(&self) -> Rc<Box<dyn SyncClient>> {
         match self.platform.as_str() {
             "Coinbase" => {
