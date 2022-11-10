@@ -121,20 +121,23 @@ impl Coinbase {
                 }
             },
             "interest" => {
-                // Incredibly small staking rewards will not give appropriate cost basis for asset
-                let unit_price = match transaction.native_amount.amount.parse::<f64>().unwrap() < 0.01 {
-                    true => { 0.0 },
-                    false => { transaction.native_amount.amount.parse::<f64>().unwrap() / transaction.amount.amount.parse::<f64>().unwrap() },
-                };
-                Ok(Box::new(CoinReward::new(
-                    transaction.id,
-                    transaction.created_at,
-                    transaction.amount.currency,
-                    unit_price,
-                    transaction.amount.amount.parse::<f64>().unwrap(),
-                    "Staking".to_string(),
-                    "Coinbase Rewards".to_string()
-                )))
+                // Interest native amount is restricted to two decimal points. When staking rewards are very small
+                // and equate to less than $0.01, API response is $0.00. This will throw off cost basis calculations.
+                // Instead, just ignore these transactions all together as they are so negligible to begin with.
+                if transaction.native_amount.amount.parse::<f64>().unwrap() == 0.0 {
+                    Ok(Box::new(Dud {}))
+                } else {
+                    Ok(Box::new(CoinReward::new(
+                        transaction.id,
+                        transaction.created_at,
+                        transaction.amount.currency,
+                        transaction.native_amount.amount.parse::<f64>().unwrap() / transaction.amount.amount.parse::<f64>().unwrap(),
+                        transaction.amount.amount.parse::<f64>().unwrap(),
+                        "Staking".to_string(),
+                        "Coinbase Rewards".to_string()
+                    )))
+                }
+                
             },
             // "request" => {
                 
@@ -420,7 +423,7 @@ impl SyncClient for Coinbase {
         // Ok(result)
 
         // match self.client.print_response(
-        //     &"/v2/accounts/edc51d44-6f3a-5c59-9210-aff67ff6df83/transactions/9b5cd3c3-0a13-5504-9b0a-cd6337bd5f23?expand[]=buy&expand[]=sell&expand[]=trade"
+        //     &"/v2/accounts/e7ccc453-7e87-50ee-94b9-7750c5e92935/transactions/e4dde550-3138-5ed0-b614-f7f1502acdc9?expand[]=buy&expand[]=sell&expand[]=trade"
         //     .to_string()
         // ).await {
         //     Ok(response) => { println!("{}", response); }
