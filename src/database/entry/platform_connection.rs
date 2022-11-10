@@ -90,7 +90,7 @@ impl DatabaseEntry for PlatformConnection {
         statement.bind(1, self.nickname.as_str()).unwrap();
         statement.bind(2, self.platform.as_str()).unwrap();
         statement.bind(3, &bincode::serialize(&self).unwrap() as &[u8]).unwrap();
-        statement.next().unwrap();
+        statement.next().ok();
         Ok(())
     }
 }
