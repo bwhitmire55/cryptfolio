@@ -14,7 +14,7 @@ use cryptfolio::app::CryptfolioApp;
 
 // #[tokio::test]
 // async fn coinbase_pro_sync() {
-//     let app = CryptfolioApp::new("local/cb_pro.db").unwrap();
+//     let app = CryptfolioApp::new("local/test.db").unwrap();
 //     let default_profile = cryptfolio::platform::exchange::CoinbasePro::new(
 //         "KEY",
 //         "SECRET",

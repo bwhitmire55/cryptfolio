@@ -183,9 +183,15 @@ impl Coinbase {
                     transaction.amount.amount.parse::<f64>().unwrap().abs()
                 )))
             },
-            // "fiat_withdrawal" => {
-            // 
-            // },
+            "fiat_withdrawal" => {
+                Ok(Box::new(FiatTransfer::new(
+                    transaction.id,
+                    transaction.created_at,
+                    account_id.to_string(),
+                    "FIAT Institution".to_string(),
+                    transaction.amount.amount.parse::<f64>().unwrap().abs()
+                )))
+            },
             "exchange_deposit" => {
                 Ok(Box::new(FiatTransfer::new(
                     transaction.id,
