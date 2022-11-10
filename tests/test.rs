@@ -95,10 +95,10 @@ use cryptfolio::app::CryptfolioApp;
 //     app.add_platform("Blake", coinbase_pro_2).unwrap();
 // }
 
-#[test]
-fn get_connections() {
-    let app = CryptfolioApp::new("local/test.db").unwrap();
-    for connection in app.get_connections() {
-        println!("Connection: {}", connection.get_name());
-    }
-}
+// #[test]
+// fn get_connections() {
+//     let app = CryptfolioApp::new("local/test.db").unwrap();
+//     for connection in app.get_connections() {
+//         println!("Connection: {} [{}]", connection.1.get_name(), connection.0);
+//     }
+// }

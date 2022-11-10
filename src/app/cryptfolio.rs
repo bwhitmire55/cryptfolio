@@ -41,12 +41,16 @@ impl CryptfolioApp {
         }
 
         // Load existing connections from database
-        
+        let mut platforms = HashMap::<String, Rc<Box<dyn SyncClient>>>::new();
+        for connection in DatabaseScript::fetch_connections(db.get_dbh()) {
+            let key = format!("{}:{}", connection.platform, connection.nickname);
+            platforms.insert(key.to_string(), connection.to_concrete_type());
+        }
 
         Ok(
             CryptfolioApp {
                 database: db,
-                connected_platforms: RefCell::new(HashMap::new()),
+                connected_platforms: RefCell::new(platforms),
             }
         )
     }
@@ -95,7 +99,14 @@ impl CryptfolioApp {
         DatabaseScript::fetch_coin_record(self.database.get_dbh(), coin)
     }
 
-    pub fn get_connections(&self) -> Vec<Rc<Box<dyn SyncClient>>> {
-        DatabaseScript::fetch_connections(self.database.get_dbh())
+    pub fn get_connections(&self) -> Vec<(String, Rc<Box<dyn SyncClient>>)> {
+        let mut connections = Vec::<(String, Rc<Box<dyn SyncClient>>)>::new();
+        for key in self.connected_platforms.borrow().keys() {
+            connections.push((
+                key.split(":").nth(1).unwrap_or("UNDEFINED").to_string(),
+                self.connected_platforms.borrow().get(key).unwrap().to_owned(),
+            ));
+        }
+        return connections;
     }
 }

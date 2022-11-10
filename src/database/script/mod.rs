@@ -71,19 +71,13 @@ impl DatabaseScript {
         }
     }
 
-    pub fn fetch_connections(dbh: &Connection) -> Vec<Rc<Box<dyn SyncClient>>> {
+    pub fn fetch_connections(dbh: &Connection) -> Vec<PlatformConnection> {
         let mut connections = Vec::<PlatformConnection>::new();
         let mut statement = dbh.prepare("SELECT object FROM connections").unwrap();
         while let State::Row = statement.next().unwrap() {
             connections.push(bincode::deserialize(&statement.read::<Vec<u8>>(0).unwrap() as &[u8]).unwrap());
         }
-       
-        let mut clients = Vec::<Rc<Box<dyn SyncClient>>>::new();
-        for connection in connections {
-            clients.push(connection.to_concrete_type());
-        }
-
-        return clients;
+        return connections;
     }
 
     pub fn fetch_coin_record(dbh: &Connection, coin: String) -> CoinRecord {
