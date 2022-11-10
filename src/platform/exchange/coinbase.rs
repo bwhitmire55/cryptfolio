@@ -247,9 +247,9 @@ impl Coinbase {
                         format!("{}-USD", transaction.amount.currency),
                         transaction.advanced_trade_fill.as_ref().unwrap().fill_price.parse::<f64>().unwrap(),
                         transaction.amount.amount.parse::<f64>().unwrap().abs(),
-                        transaction.native_amount.amount.parse::<f64>().unwrap().abs() - 
+                        (transaction.native_amount.amount.parse::<f64>().unwrap().abs() - 
                         (transaction.amount.amount.parse::<f64>().unwrap().abs() *
-                        transaction.advanced_trade_fill.as_ref().unwrap().fill_price.parse::<f64>().unwrap()),
+                        transaction.advanced_trade_fill.as_ref().unwrap().fill_price.parse::<f64>().unwrap())).abs(),
                         side,
                         "Coinbase".to_string()
                     )))
