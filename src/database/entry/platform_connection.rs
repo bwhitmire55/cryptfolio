@@ -70,7 +70,7 @@ impl PlatformConnection {
                     &self.connection_data[2].value
                 ).unwrap()));
             },
-            "Solona" => {
+            "Solana" => {
                 return Rc::new(Box::new(Solana::new(
                     self.connection_data[0].value.to_string()
                 ).unwrap()));

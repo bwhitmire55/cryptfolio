@@ -1,11 +1,9 @@
 use crate::error::CryptfolioError;
 use crate::database::entry::PlatformConnection;
-use crate::platform::SyncClient;
 use crate::recording::CoinRecord;
 
 use sqlite3::Connection;
 use sqlite3::State;
-use std::rc::Rc;
 
 pub struct DatabaseScript {}
 

@@ -7,7 +7,7 @@ use cryptfolio::app::CryptfolioApp;
 //         "KEY",
 //         "SECRET"
 //     ).unwrap();
-//     let handle = app.add_platform("Default profile", platform).unwrap();
+//     let handle = app.add_platform("Default profile", platform);
 
 //     app.sync_platform(handle).await.unwrap();
 // }
@@ -25,8 +25,8 @@ use cryptfolio::app::CryptfolioApp;
 //         "SECRET",
 //         "PASSPHRASE"
 //     ).unwrap();
-//     let handle = app.add_platform("Default profile", default_profile).unwrap();
-//     let handle2 = app.add_platform("Blake profile", blake_profile).unwrap();
+//     let handle = app.add_platform("Default profile", default_profile);
+//     let handle2 = app.add_platform("Blake profile", blake_profile);
 
 //     app.sync_platform(handle).await.unwrap();
 //     app.sync_platform(handle2).await.unwrap();
@@ -39,7 +39,7 @@ use cryptfolio::app::CryptfolioApp;
 //         "ADDRESS".to_string()
 //     ).unwrap();
 
-//     let handle = app.add_platform("Solflare Wallet", solflare).unwrap();
+//     let handle = app.add_platform("Solflare Wallet", solflare);
     
 //     app.sync_platform(handle).await.unwrap();
 // }
